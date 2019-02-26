@@ -23,12 +23,18 @@
 
 如果使用Consul
 
+~~~ shell
+
     brew install consul
     consul agent -dev
+~~~
 
 或
 
-    docker run consul
+~~~shell
+
+docker run consul
+~~~
 
 通过任何micro命令带参数 --registry=consul 来使用consul，例如micro --registry=consul list services
 
@@ -38,8 +44,9 @@ Go Micro是一个用于在Go中开发微服务的RPC框架
 
 #### 安装
 
+~~~ shell 
 go get github.com/micro/go-micro
-
+~~~
 #### Protobuf
 
 您还需要使用prototype -gen-micro来生成代码
@@ -52,52 +59,69 @@ go get github.com/micro/go-micro
 
 #### 安装
 
-    go get github.com/micro/micro
+~~~ shell
+
+go get github.com/micro/micro
+~~~
 
 #### Docker
 
 可以使用预构建的docker映像
 
-    docker pull microhq/micro
-
+~~~ shell
+docker pull microhq/micro
+~~~
 #### 尝试命令行(CLI)
 
 运行欢迎服务
 
-    go get github.com/micro/examples/greeter/srv && srv
+~~~ shell
+
+go get github.com/micro/examples/greeter/srv && srv
+~~~
 
 服务列表
 
-    $ micro list services
-    consul
-    go.micro.srv.greeter
+~~~ shell
+
+$ micro list services
+consul
+go.micro.srv.greeter
+~~~
 
 获取服务
 
-    $ micro get service go.micro.srv.greeter
-    service  go.micro.srv.greeter
+~~~ shell
 
-    version 1.0.0
+$ micro get service go.micro.srv.greeter
+service  go.micro.srv.greeter
 
-    Id	Address	Port	Metadata
-    go.micro.srv.greeter-34c55534-368b-11e6-b732-68a86d0d36b6	192.168.1.66	62525	server=rpc,registry=consul,transport=http,broker=http
+version 1.0.0
 
-    Endpoint: Say.Hello
-    Metadata: stream=false
+Id  Address Port   Metadata
+go.micro.srv.greeter-34c55534-368b-11e6-b732-68a86d0d36b6   192.168.1.66   62525   server=rpc,registry=consul,transport=http,broker=http
 
-    Request: {
-        name string
-    }
+Endpoint: Say.Hello
+Metadata: stream=false
 
-    Response: {
-        msg string
-    }
+Request: {
+    name string
+}
+
+Response: {
+    msg string
+}
+
+~~~
 
 调用服务
 
-    $ micro call go.micro.srv.greeter Say.Hello '{"name": "John"}'
-    {
-        "msg": "Hello John"
-    }
+~~~ shell
+
+$ micro call go.micro.srv.greeter Say.Hello '{"name": "John"}'
+{
+    "msg": "Hello John"
+}
+~~~
 
 访问[github.com/micro/micro](https://github.com/micro/micro)了解更多信

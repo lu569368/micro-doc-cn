@@ -4,17 +4,37 @@
 
 **目录**
 
+- [概述](#概述)
 - [特征](#特征)
+- [开始](#开始)
+    - [安装Protobuf](#安装protobuf)
+    - [服务发现](#服务发现)
+        - [consul](#consul)
+    - [编写一个服务](#编写一个服务)
+        - [创建proto服务](#创建proto服务)
+        - [生成proto](#生成proto)
+        - [编写服务](#编写服务)
+        - [运行服务](#运行服务)
+            - [定义一个客户端](#定义一个客户端)
+        - [运行客户端](#运行客户端)
+    - [编写一个函数](#编写一个函数)
+        - [定义函数](#定义函数)
+    - [发布订阅](#发布订阅)
+        - [发布](#发布)
+        - [订阅](#订阅)
+    - [插件](#插件)
+        - [通过插件编译](#通过插件编译)
+        - [插件选项](#插件选项)
+        - [编写插件](#编写插件)
+    - [包装器](#包装器)
+        - [客户端](#客户端)
+    - [示例](#示例)
+    - [其他语言](#其他语言)
+    - [赞助](#赞助)
 
 ## 概述
 
-Go Micro 满足分布式系统的核心需求，包括RPC和事件驱动的通信。**Micro** 的设计哲学是健全的可插拔结构。我们提供了默认设置但是所有设置可以轻松替换。 
-
-<img src="https://micro.mu/docs/images/go-micro.svg" />
-
-插件地址 [github.com/micro/go-plugins](https://github.com/micro/go-plugins)。
-
-关注我们的 [Twitter](https://twitter.com/microhq) 或者加入 [Slack](http://slack.micro.mu/) 社区.
+Go Micro 满足分布式系统的核心需求，包括RPC和事件驱动的通信。**Micro** 的设计哲学是健全的可插拔结构。我们提供了默认设置但是所有设置可以轻松替换。
 
 ## 特征
 
@@ -72,34 +92,42 @@ Go Micro 抽象了分布式系统的细节。下面是主要特征。
 这是一个简单的欢迎RPC服务示例
 在[examples/service](https://github.com/micro/examples/tree/master/service)可以找到这个列子
 
-##### 创建proto服务
+#### 创建proto服务
 
 微服务的关键需求之一是强定义接口。Micro使用protobuf来实现这一点。
 
 在这里，我们使用Hello方法定义了Greeter处理程序。它需要一个HelloRequest和HelloResponse，都有一个字符串参数。
 在这里，我们定义了带有Hello方法的Greeter handler。它需要一个HelloRequest和HelloResponse，都有一个字符串参数。
 
-    syntax = "proto3";
+~~~ protobuf
 
-    service Greeter {
-        rpc Hello(HelloRequest) returns (HelloResponse) {}
-    }
+syntax = "proto3";
 
-    message HelloRequest {
-        string name = 1;
-    }
+service Greeter {
+    rpc Hello(HelloRequest) returns (HelloResponse) {}
+}
 
-    message HelloResponse {
-        string greeting = 2;
-    }
+message HelloRequest {
+    string name = 1;
+}
 
-##### 生成proto
+message HelloResponse {
+    string greeting = 2;
+}
+
+~~~
+
+#### 生成proto
 
 当编写好proto定义后，我们必须通过protoc和micro plugin来编译它。
 
-    protoc --proto_path=$GOPATH/src:. --micro_out=. --go_out=. path/to/greeter.proto
+~~~ shell
 
-##### 编写服务
+protoc --proto_path=$GOPATH/src:. --micro_out=. --go_out=. path/to/greeter.proto
+
+~~~
+
+#### 编写服务
 
 下面是欢迎服务的代码。
 
@@ -110,98 +138,114 @@ Go Micro 抽象了分布式系统的细节。下面是主要特征。
   3. 注册Greeter handler
   4. 运行服务
 
-    package main
-    import (
-        "context"
-        "fmt"
+~~~ go
 
-        micro "github.com/micro/go-micro"
-        proto "github.com/micro/examples/service/proto"
+package main
+import (
+    "context"
+    "fmt"
+
+    micro "github.com/micro/go-micro"
+    proto "github.com/micro/examples/service/proto"
+)
+type Greeter struct{}
+
+func (g *Greeter) Hello(ctx context.Context, req *proto.HelloRequest, rsp *proto.HelloResponse) error {
+    rsp.Greeting = "Hello " + req.Name
+    return nil
+}
+
+func main() {
+    // 创建一个新服务。这里有选择性的包含一些选项。
+    service := micro.NewService(
+        micro.Name("greeter"),
     )
-    type Greeter struct{}
 
-    func (g *Greeter) Hello(ctx context.Context, req *proto.HelloRequest, rsp *proto.HelloResponse) error {
-        rsp.Greeting = "Hello " + req.Name
-        return nil
+    // Init将解析命令行参数。
+    service.Init()
+
+    // 注册 handler
+    proto.RegisterGreeterHandler(service.Server(), new(Greeter))
+
+    // 运行服务
+    if err := service.Run(); err != nil {
+        fmt.Println(err)
     }
+}
 
-    func main() {
-        // 创建一个新服务。这里有选择性的包含一些选项。
-        service := micro.NewService(
-            micro.Name("greeter"),
-        )
+~~~
 
-        // Init将解析命令行参数。
-        service.Init()
+#### 运行服务
 
-        // 注册 handler
-        proto.RegisterGreeterHandler(service.Server(), new(Greeter))
+~~~ shell
+go run examples/service/main.go
+~~~
 
-        // 运行服务
-        if err := service.Run(); err != nil {
-            fmt.Println(err)
-        }
-    }
+输出
 
-##### 运行服务
-
-    go run examples/service/main.go
-
-##### 输出
-
-    2016/03/14 10:59:14 Listening on [::]:50137
-    2016/03/14 10:59:14 Broker Listening on [::]:50138
-    2016/03/14 10:59:14 Registering node: greeter-ca62b017-e9d3-11e5-9bbb-68a86d0d36b6
+~~~ shell
+2016/03/14 10:59:14 Listening on [::]:50137
+2016/03/14 10:59:14 Broker Listening on [::]:50138
+2016/03/14 10:59:14 Registering node: greeter-ca62b017-e9d3-11e5-9bbb-68a86d0d36b6
+~~~
 
 ##### 定义一个客户端
 
 下面是查询欢迎服务的客户端代码。
 生成的proto 包含一个迎客户端（greeter client ）来减少样板代码编写。
 
-    package main
+~~~ go
+package main
 
-    import (
-        "context"
-        "fmt"
+import (
+    "context"
+    "fmt"
 
-        micro "github.com/micro/go-micro"
-        proto "github.com/micro/examples/service/proto"
-    )
+    micro "github.com/micro/go-micro"
+    proto "github.com/micro/examples/service/proto"
+)
 
 
-    func main() {
-        // 创建一个新服务。这里有选择性的包含一些选项。
-        service := micro.NewService(micro.Name("greeter.client"))
-        service.Init()
+func main() {
+    // 创建一个新服务。这里有选择性的包含一些选项。
+    service := micro.NewService(micro.Name("greeter.client"))
+    service.Init()
 
-        // 创建一个欢迎客户端
-        greeter := proto.NewGreeterService("greeter", service.Client())
+    // 创建一个欢迎客户端
+    greeter := proto.NewGreeterService("greeter", service.Client())
 
-        // 调用欢迎方法
-        rsp, err := greeter.Hello(context.TODO(), &proto.HelloRequest{Name: "John"})
-        if err != nil {
-            fmt.Println(err)
-        }
-
-        // 打印响应结果
-        fmt.Println(rsp.Greeting)
+    // 调用欢迎方法
+    rsp, err := greeter.Hello(context.TODO(), &proto.HelloRequest{Name: "John"})
+    if err != nil {
+        fmt.Println(err)
     }
 
-##### 运行客户端
+    // 打印响应结果
+    fmt.Println(rsp.Greeting)
+}
+~~~
 
-    go run client.go
+#### 运行客户端
 
-##### 输出
+~~~ shell
+go run client.go
+~~~
 
+输出
+
+~~~ shell
     Hello John
+~~~
 
-##### 编写一个函数
+### 编写一个函数
 
 Go Micro包括函数编程模型。
 
 函数是在完成请求后退出的只执行一次行服务。
 
-##### 定义函数
+#### 定义函数
+
+~~~ go
 
     package main
 
@@ -235,6 +279,8 @@ Go Micro包括函数编程模型。
         fnc.Run()
     }
 
+~~~
+
 就这么简单。
 
 ### 发布订阅
@@ -243,28 +289,37 @@ Go-micro为事件驱动架构提供了一个内置的message broker接口。
 
 发布订阅的RPC操作基于相同protobuf生成的消息。它们自动编码/解码，并通过代理发送。默认情况下，go-micro包括一个点对点的http代理，但这可以通过go-plugins替换。
 
-##### 发布
+#### 发布
 
 通过主题(topic)名称和service client创建一个新的publisher 
 
-    p := micro.NewPublisher("events", service.Client())
+~~~ go
+p := micro.NewPublisher("events", service.Client())
+~~~
 
 发布一个proto消息
 
-    p.Publish(context.TODO(), &proto.Event{Name: "event"})
+~~~ go
+p.Publish(context.TODO(), &proto.Event{Name: "event"})
+~~~
+#### 订阅
 
-##### 订阅
+创建消息处理程序。它的签名(signature)应该是  func(context.Context, v interface{}) error。
 
-创建消息处理程序。它的信号(signature)应该是 <font color=#000 >func(context.Context, v interface{}) error</font>。
+~~~ go
 
     func ProcessEvent(ctx context.Context, event *proto.Event) error {
         fmt.Printf("Got event %+v\n", event)
         return nil
     }
 
+~~~
+
 注册message handler并带topic参数
 
+~~~ go
     micro.RegisterSubscriber("events", ProcessEvent)
+~~~
 
 有关完整示例，请参见示例[examples/pubsub](https://github.com/micro/examples/tree/master/pubsub)
 
@@ -273,71 +328,90 @@ Go-micro为事件驱动架构提供了一个内置的message broker接口。
 默认情况下，go-micro 只提供少量核心接口的实现，但是完全可以通过插件是实现。在
 [ github.com/micro/go-plugins](https://github.com/micro/go-plugins)已经提供了几十个可用的插件。欢迎贡献！
 
-##### 通过插件编译
+#### 通过插件编译
 
 如果您想集成插件，只需将它们链接到一个单独的文件中并重新编译即可
 创建一个插件 .go 文件
 
-    import (
-            // etcd v3 registry
-            _ "github.com/micro/go-plugins/registry/etcdv3"
-            // nats transport
-            _ "github.com/micro/go-plugins/transport/nats"
-            // kafka broker
-            _ "github.com/micro/go-plugins/broker/kafka"
-    )
+~~~ go
+
+import (
+        // etcd v3 registry
+        _ "github.com/micro/go-plugins/registry/etcdv3"
+        // nats transport
+        _ "github.com/micro/go-plugins/transport/nats"
+        // kafka broker
+        _ "github.com/micro/go-plugins/broker/kafka"
+)
+
+~~~
 
 编译二进制
 
-    // For local use
-    go build -i -o service ./main.go ./plugins.go
+~~~ shell
+
+// For local use
+go build -i -o service ./main.go ./plugins.go
+
+~~~
 
 插件参数的用例
 
-    service --registry=etcdv3 --transport=nats --broker=kafka
+~~~ shell
 
-##### 插件选项
+service --registry=etcdv3 --transport=nats --broker=kafka
+
+~~~
+
+#### 插件选项
 
 或者，您可以将插件设置为服务的选项
+~~~ go
 
-    import (
-            "github.com/micro/go-micro" 
-            // etcd v3 registry
-            "github.com/micro/go-plugins/registry/etcdv3"
-            // nats transport
-            "github.com/micro/go-plugins/transport/nats"
-            // kafka broker
-            "github.com/micro/go-plugins/broker/kafka"
-    )
+import (
+        "github.com/micro/go-micro" 
+        // etcd v3 registry
+        "github.com/micro/go-plugins/registry/etcdv3"
+        // nats transport
+        "github.com/micro/go-plugins/transport/nats"
+        // kafka broker
+        "github.com/micro/go-plugins/broker/kafka"
+)
 
-    func main() {
-        registry := etcdv3.NewRegistry()
-        broker := kafka.NewBroker()
-        transport := nats.NewTransport()
+func main() {
+    registry := etcdv3.NewRegistry()
+    broker := kafka.NewBroker()
+    transport := nats.NewTransport()
 
-            service := micro.NewService(
-                    micro.Name("greeter"),
-                    micro.Registry(registry),
-                    micro.Broker(broker),
-                    micro.Transport(transport),
-            )
+        service := micro.NewService(
+                micro.Name("greeter"),
+                micro.Registry(registry),
+                micro.Broker(broker),
+                micro.Transport(transport),
+        )
 
-        service.Init()
-        service.Run()
-    }
+    service.Init()
+    service.Run()
+}
 
-##### 编写插件
+~~~
+
+#### 编写插件
 
 插件是建立在Go接口基础上的概念。每个包维护一个高级接口抽象。只需实现接口并将其作为选项传递给服务。
 
-    type Registry interface {
-        Register(*Service, ...RegisterOption) error
-        Deregister(*Service) error
-        GetService(string) ([]*Service, error)
-        ListServices() ([]*Service, error)
-        Watch() (Watcher, error)
-        String() string
-    }
+~~~ go
+
+type Registry interface {
+    Register(*Service, ...RegisterOption) error
+    Deregister(*Service) error
+    GetService(string) ([]*Service, error)
+    ListServices() ([]*Service, error)
+    Watch() (Watcher, error)
+    String() string
+}
+
+~~~
 
 浏览[go-plugins](https://github.com/micro/go-plugins)以更好地了解实现细节。
 
@@ -349,6 +423,8 @@ Handler
 
 下面是记录传入请求的服务handler包装器样例
 
+~~~ go
+
     // implements the server.HandlerWrapper
     func logWrapper(fn server.HandlerFunc) server.HandlerFunc {
         return func(ctx context.Context, req server.Request, rsp interface{}) error {
@@ -357,39 +433,49 @@ Handler
         }
     }
 
+~~~
+
 它可以在创建服务时初始化
 
-    service := micro.NewService(
-        micro.Name("greeter"),
-        // wrap the handler
-        micro.WrapHandler(logWrapper),
-    )
+~~~ go
 
-##### 客户端
+service := micro.NewService(
+    micro.Name("greeter"),
+    // wrap the handler
+    micro.WrapHandler(logWrapper),
+)
+
+~~~
+
+#### 客户端
 
 下面是一个记录请求的客户端包装器示例
 
-    type logWrapper struct {
-        client.Client
-    }
+~~~ go
 
-    func (l *logWrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
-        fmt.Printf("[wrapper] client request to service: %s endpoint: %s\n", req.Service(), req.Endpoint())
-        return l.Client.Call(ctx, req, rsp)
-    }
+type logWrapper struct {
+    client.Client
+}
 
-    // implements client.Wrapper as logWrapper
-    func logWrap(c client.Client) client.Client {
-        return &logWrapper{c}
-    }
+func (l *logWrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
+    fmt.Printf("[wrapper] client request to service: %s endpoint: %s\n", req.Service(), req.Endpoint())
+    return l.Client.Call(ctx, req, rsp)
+}
 
-    它可以在创建服务时初始化
+// implements client.Wrapper as logWrapper
+func logWrap(c client.Client) client.Client {
+    return &logWrapper{c}
+}
 
-    service := micro.NewService(
-        micro.Name("greeter"),
-        // wrap the client
-        micro.WrapClient(logWrap),
-    )
+它可以在创建服务时初始化
+
+service := micro.NewService(
+    micro.Name("greeter"),
+    // wrap the client
+    micro.WrapClient(logWrap),
+)
+
+~~~
 
 ### 示例
 
@@ -403,7 +489,7 @@ Handler
 
 查看[Java-micro](https://github.com/Sixt/ja-micro)以编写Java服务
 
-## Sponsors
+### 赞助
 
 Sixt 是Micro的赞助公司
 

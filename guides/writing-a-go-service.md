@@ -23,14 +23,14 @@
 顶层[服务](https://godoc.org/github.com/micro/go-micro#Service)接口是构建服务的主要组件。它将Go Micro的所有底层包封装到一个适当的接口中。
 
 ~~~ go
-    type Service interface {
-        Init(...Option)
-        Options() Options
-        Client() client.Client
-        Server() server.Server
-        Run() error
-        String() string
-    }
+type Service interface {
+    Init(...Option)
+    Options() Options
+    Client() client.Client
+    Server() server.Server
+    Run() error
+    String() string
+}
 ~~~
 
 #### 1.初始化
@@ -79,14 +79,14 @@ service := micro.NewService(
 要解析标志，请使用service.Init。此外，访问标志使用 micro.Action 选项。
 
 ~~~go
-    service.Init(
-            micro.Action(func(c *cli.Context) {
-                    env := c.StringFlag("environment")
-                    if len(env) > 0 {
-                            fmt.Println("Environment set to", env)
-                    }
-            }),
-    )
+service.Init(
+        micro.Action(func(c *cli.Context) {
+                env := c.StringFlag("environment")
+                if len(env) > 0 {
+                        fmt.Println("Environment set to", env)
+                }
+        }),
+)
 ~~~
 
 Go Micro提供了预先定义的标志，可以在service.Init调用后设置和解析。在[这里](https://godoc.org/github.com/micro/go-micro/cmd#pkg-variables)看到所有的标志。
@@ -101,20 +101,20 @@ greeter.proto
 
 ~~~ protobuf
 
-    syntax = "proto3";
+syntax = "proto3";
 
-    service Greeter {
-        rpc Hello(HelloRequest) returns (HelloResponse) {}
-    }
+service Greeter {
+    rpc Hello(HelloRequest) returns (HelloResponse) {}
+}
 
-    message HelloRequest {
-        string name = 1;
-    }
+message HelloRequest {
+    string name = 1;
+}
 
-    message HelloResponse {
-        string greeting = 2;
-    }
-    
+message HelloResponse {
+    string greeting = 2;
+}
+
 ~~~
 
 在这里，我们使用Hello方法定义一个名为Greeter的服务处理程序，该方法接受参数HelloRequest类型并返回HelloResponse。
@@ -130,14 +130,17 @@ greeter.proto
 我们使用protoc、protoc-gen-go和protoc-gen-micro来为这个定义生成具体的go实现。
 
 ~~~ shell
+
 go get github.com/golang/protobuf/{proto,protoc-gen-go}
 ~~~
 
 ~~~ shell
+
 go get github.com/micro/protoc-gen-micro
 ~~~
 
 ~~~ shell
+
 protoc --proto_path=$GOPATH/src:. --micro_out=. --go_out=.greeter.proto
 ~~~
 
