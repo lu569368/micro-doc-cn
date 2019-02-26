@@ -15,26 +15,26 @@
 
 ## 指南
 
-- [安转指南](guide/installGuide.md)
-- [GRPC网关](guide/grpcgateway.md)
-- [编写一个Go服务](guide/wgoserv.md)
-- [编写一个Go方法](wgofunc.md)
-- [容错](guide/faulttolerance.md)
+- [安转指南](guides/install-guide.md)
+- [GRPC网关](guides/grpc-gateway.md)
+- [编写一个Go服务](guides/writing-a-go-service.md)
+- [编写一个Go方法](guides/writing-a-go-function.md)
+- [容错](guides/faulttolerance.md)
 
 ## Micro
 
 - [概述](micro/overview.md)
-- [API网关](micro/apigateway.md)
+- [API网关](micro/api-gateway.md)
 - [Web仪表盘](micro/web.md)
 - [服务代理](micro/proxy.md)
 - [命令行](micro/cli.md)
 - [SlackOps Bot](micro/bot.md)
-- [新建模板](micro/template.md)
+- [新建模板](micro/new-template.md)
 
 ## Go API
 
 - [概述](api/overview.md)
-- [handlers](api/hanlers.md)
+- [handlers](api/handlers.md)
 
 ## Go Config
 
@@ -46,8 +46,8 @@
 
 ## Go Micro
 
-- [概述](gomicro/overview.md)
-- [架构](gomicro/architecture.md)
+- [概述](go-micro/overview.md)
+- [架构](go-micro/architecture.md)
 
 ## 部署
 
