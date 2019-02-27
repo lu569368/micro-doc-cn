@@ -20,14 +20,13 @@ Micro解决了构建可伸缩系统的关键需求。它采用微服务架构模
 
 - **Interactive CLI:** cil通过终端(terminal)来描述，查询，并你的平台和服务直接交互。cli提供你希望了解的所有微服务命令。它还包含一个交互模式。
 
-- **Service Proxy:** 一个构建在[Go Micro](https://github.com/micro/go-micro) and the [MUCP](https://github.com/micro/protocol) 协议上的透明代理，将服务发现，负载均衡，容错，消息编码，中间件，监视等飞流到单个位置。将它独立运行或在你的服务端运行。
+- **Service Proxy:** 一个构建在[Go Micro](https://github.com/micro/go-micro) and the [MUCP](https://github.com/micro/protocol) 协议上的透明代理，将服务发现，负载均衡，容错，消息编码，中间件，监视等卸载(Offload)单个位置。将它独立运行或与你的服务一起运行
 
 - **Service Templates:** 快速生成新的服务模板。Micro为微服务提供预定义模板。始终以相同的方式开始，高效的构建相同服务。
 
-- **SlackOps Bot:** 一个运行在你的平台上的机器人，让你从Slack本身管理你的应用程序。微机器人支持ChatOps，让你能够通过消息与你的团队一起做任何事情。它还包括创建slack commmand作为动态发现的服务的能力。
+- **SlackOps Bot:** 一个运行在你的平台上的机器人，让你从Slack本身管理你的应用程序。微机器人支持ChatOps，让你能够通过消息与你的团队一起做任何事情。它还包括把创建slack命令作为可被动态发现的能力。
 
-- **Web Dashboard:** 微博仪表盘让你能够浏览你的服务、描述他们的端点(endpoints)、请求和响应格式、甚至
-直接查询。仪表盘还内建了一个cli，开发人员可以直接进入终端。
+- **Web Dashboard:** Web仪表盘让你能够浏览你的服务、描述他们的端点(endpoints)、请求和响应格式、甚至直接查询。仪表盘还内建了一个cli，开发人员可以直接进入终端。
 
 ## 准备开始
 有关工具箱的体系结构、安装和使用的详细信息，请参见[翻译文档](catalogue.md)或[原始文档](https://micro.mu/docs/toolkit.html)。
