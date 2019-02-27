@@ -1,6 +1,6 @@
 # API网关
 
-> **摘要：**micro api是一个api网关
+> **摘要：** micro api是一个api网关
 
 **目录**
 
