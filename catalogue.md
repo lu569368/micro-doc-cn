@@ -19,7 +19,7 @@
 - [GRPC网关](guides/grpc-gateway.md)
 - [编写一个Go服务](guides/writing-a-go-service.md)
 - [编写一个Go方法](guides/writing-a-go-function.md)
-- [容错](guides/faulttolerance.md)
+- [容错](guides/fault-tolerance.md)
 
 ## Micro
 
