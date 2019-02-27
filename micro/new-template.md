@@ -6,7 +6,7 @@
   - [选项](#选项)
   - [帮助](#帮助)
 
-## micro 新建[服务]
+## micro new [service]
 
 micro new命令是一种快速生成微服务模板的方法。
 
