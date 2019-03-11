@@ -2,16 +2,25 @@
 
 **目录**
 
+  - [API Handler](#api-handler)
+  - [Broker Handler](#broker-handler)
+  - [CloudEvents Handler](#cloudevents-handler)
+  - [Event Handler](#event-handler)
+  - [HTTP Handler](#http-handler)
+  - [Registry Handler](#registry-handler)
+  - [RPC Handler](#rpc-handler)
+  - [Web Handler](#web-handler)
+
 Handlers用于处理http请求。为了方便起见，它使用http.Handler模式。
 
 - [api](#api-handler) - 处理任意http请求。通过RPC完全控制http请求/响应。
-- [broker](#broker) - 实现 go-micro broker 接口的http处理程序。
-- [cloudevents](#cloudevents) -处理CloudEvents并将其发布到消息总线。
-- [event](#event) - 处理任意HTTP请求并发布到消息总线。
-- [http](#http) - 处理任意HTTP请求并作为反向代理转发。
-- [registry](registry) - 实现go-micro registry接口的http处理程序
-- [rpc](#rpc) - 处理json和protobuf POST请求。通过RPC转发。
-- [web](#web) - 包含支持web socket的HTTP处理程序
+- [broker](#broker-handler) - 实现 go-micro broker 接口的http处理程序。
+- [cloudevents](#cloudevents-handler) -处理CloudEvents并将其发布到消息总线。
+- [event](#event-handler) - 处理任意HTTP请求并发布到消息总线。
+- [http](#http-handler) - 处理任意HTTP请求并作为反向代理转发。
+- [registry](registry-handler) - 实现go-micro registry接口的http处理程序
+- [rpc](#rpc-handler) - 处理json和protobuf POST请求。通过RPC转发。
+- [web](#web-handler) - 包含支持web socket的HTTP处理程序
 
 ## API Handler
 
