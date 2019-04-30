@@ -2,20 +2,21 @@
 
 **目录**
 
-- [工具箱](#工具箱)
-  - [API](#api)
-  - [Web](#web)
-  - [代理](#代理)
-  - [Bot](#bot)
-  - [CLI](#cli)
-- [Go Micro](#go-micro)
-  - [注册(Registry)](#注册registry)
-  - [选择器](#选择器)
-  - [经纪人(Broker)](#经纪人broker)
-  - [传输层(Transport)](#传输层transport)
-  - [客户端](#客户端)
-  - [服务](#服务)
-- [插件](#插件)
+- [架构](#%E6%9E%B6%E6%9E%84)
+  - [工具箱](#%E5%B7%A5%E5%85%B7%E7%AE%B1)
+    - [API](#api)
+    - [Web](#web)
+    - [代理](#%E4%BB%A3%E7%90%86)
+    - [Bot](#bot)
+    - [CLI](#cli)
+  - [Go Micro](#go-micro)
+    - [注册(Registry)](#%E6%B3%A8%E5%86%8Cregistry)
+    - [选择器](#%E9%80%89%E6%8B%A9%E5%99%A8)
+    - [经纪人(Broker)](#%E7%BB%8F%E7%BA%AA%E4%BA%BAbroker)
+    - [传输层(Transport)](#%E4%BC%A0%E8%BE%93%E5%B1%82transport)
+    - [客户端](#%E5%AE%A2%E6%88%B7%E7%AB%AF)
+    - [服务](#%E6%9C%8D%E5%8A%A1)
+  - [插件](#%E6%8F%92%E4%BB%B6)
 
 Micro为微服务提供了基本的构建模块。他的目标是简化分布式系统的开发。因为微服务是一种架构模式，所以Micro通过工具实现逻辑上的责任分离。
 
